@@ -1,0 +1,91 @@
+Landing (AI-Structured)
+
+1. Index Information
+
+(Data about what indexes exist and their event volumes)
+
+    List available indexes
+
+| eventcount summarize=true index=* | dedup index | table index
+
+Count of events per index / Top indexes by volume
+
+    | tstats count where index=* by index
+
+    How to check if a specific index is not receiving logs (presence/absence of data)
+    From indexes list check every incoming data per index and see who is not
+
+2. Sourcetypes Information
+
+(Data about types of data sources collected)
+
+    Find all available sourcetypes
+
+| metadata type=sourcetypes | table sourcetype
+
+Log types received from specific indexes (e.g., firewall)
+
+    index=firewall | stats count by sourcetype
+
+3. Host, Source, and Sourcetype Distribution
+
+(Data about which hosts, sources, and sourcetypes exist and their relative volumes)
+
+    List all hosts or sourcetypes per index with event counts
+
+    index=* | stats count by host, sourcetype, source | sort -count
+
+4. Security Events (Failed Login Attempts)
+
+(Data on authentication failures, suspicious login activity)
+
+    Find failed login attempts (count by user, src, host)
+
+index=* sourcetype=*authentication* (failure OR "failed login") | stats count by user, src, host
+
+High failed login counts (users or IPs with >10 fails)
+
+    index=* sourcetype=*authentication* "failed login" | stats count by user, src | where count > 10
+
+5. Field and Data Structure Information
+
+(Insight about fields available and data schema)
+
+    See all fields available in an index (fieldsummary)
+
+index=my_index | fieldsummary
+
+Compare fieldsummary with raw field extraction
+
+    index=my_index | head 100 | fieldsummary
+
+6. Data Model Usage and Content
+
+(Use and counts from Common Data Models)
+
+    Common data models list (Network_Traffic, Authentication, Intrusion_Detection, Endpoint, Change, Web)
+
+    Example queries:
+
+| tstats count from datamodel=Authentication by Authentication.user
+
+    | datamodel Network_Traffic All_Traffic search | stats count by nodename
+
+7. Correlation and Notable Events (Alerts and Analytics)
+
+(Security analytic info, notable events, and correlation searches)
+
+    View correlation searches
+    Enterprise Security > Configure > Content Management
+
+    Stats from notable index by rule_name, urgency, status, mitre_technique
+
+    index=notable | stats count by rule_name, urgency, status
+    | stats count by mitre_technique
+
+8. Saved Searches and Reports
+
+(Configuration and management of saved searches and reports)
+
+    Check saved searches & reports
+    Settings > Searches, reports, and alerts
