@@ -1,0 +1,171 @@
+Landing
+
+1 - What indexes do we have available? Can you list them?
+	| eventcount summarize=true index=* | dedup index | table index
+
+Indexes
+
+    -List available indexes
+
+    -Count of events per index
+
+    Top indexes by volume
+	| tstats count where index=* by index
+
+
+2 - How would you find all available sourcetypes?
+	| metadata type=sourcetypes | table sourcetype
+
+
+Hosts, Sources, and Sourcetypes
+
+    List all hosts or sourcetypes per index
+
+	index=* 
+	| stats count by host, sourcetype, source 
+	| sort -count
+
+
+
+
+3 - Find failed login attempts
+	index=* sourcetype=*authentication* (failure OR "failed login")
+	| stats count by user, src, host
+
+4 - Look for high failed login count per user or IP:
+	index=* sourcetype=*authentication* "failed login"
+	| stats count by user, src
+	| where count > 10
+
+5 - What types of logs do we receive from our indexes?
+	index=firewall | stats count by sourcetype
+
+6 - Can you monitor the log volume trend over the last 7 days?
+
+7 - How do you check if a specific index is not receiving logs?
+	from indexes list check every incoming data per index and see who is not
+
+8 - See All Fields Available in an Index
+	index=my_index
+	| fieldsummary
+
+9 - fieldsummary vs raw field extract
+	index=my_index
+	| head 100
+	| fieldsummary
+
+10 - See List of Common Data Models
+(Network_Traffic Authentication Intrusion_Detection Endpoint Change Web)
+
+	| tstats count from datamodel=Authentication by Authentication.user
+
+	| datamodel Network_Traffic All_Traffic search
+	| stats count by nodename
+	
+
+11 - See Correlation Searches
+	Enterprise Security > Configure > Content Management
+
+12 - index=notable
+	| stats count by rule_name, urgency, status
+	| stats count by mitre_technique
+
+13 - Check Saved Searches & Reports
+	Settings > Searches, reports, and alerts
+-------------------------------------------------------------------------------------------------------------------------------
+
+1. Indexes
+🔹 List available indexes
+
+| eventcount summarize=true index=* 
+| dedup index 
+| table index
+
+🔹 Count of events per index / Top indexes by volume
+
+| tstats count where index=* by index
+
+2. Sourcetypes
+🔹 Find all available sourcetypes
+
+| metadata type=sourcetypes 
+| table sourcetype
+
+3. Hosts, Sources, and Sourcetypes
+🔹 List all hosts or sourcetypes per index
+
+index=* 
+| stats count by host, sourcetype, source 
+| sort -count
+
+4. Failed Login Attempts
+🔹 Basic failed login search
+
+index=* sourcetype=*authentication* (failure OR "failed login") 
+| stats count by user, src, host
+
+🔹 High failed login count per user or IP
+
+index=* sourcetype=*authentication* "failed login" 
+| stats count by user, src 
+| where count > 10
+
+5. Log Types from Indexes
+🔹 What types of logs do we receive from our indexes?
+
+index=firewall 
+| stats count by sourcetype
+
+6. Monitor Log Volume Trend (Last 7 Days)
+
+    🔸 (Query not provided — placeholder for custom SPL query)
+
+7. Check if an Index is Not Receiving Logs
+
+    🔸 From index list, check incoming data per index and see which one has none.
+
+8. See All Fields in an Index
+
+index=my_index 
+| fieldsummary
+
+9. Fieldsummary vs Raw Field Extract
+
+index=my_index 
+| head 100 
+| fieldsummary
+
+10. Common Data Models
+
+    Network_Traffic
+
+    Authentication
+
+    Intrusion_Detection
+
+    Endpoint
+
+    Change
+
+    Web
+
+| tstats count from datamodel=Authentication by Authentication.user
+
+| datamodel Network_Traffic All_Traffic search 
+| stats count by nodename
+
+11. Correlation Searches
+
+    🔸 Enterprise Security > Configure > Content Management
+
+12. Notable Events
+
+index=notable 
+| stats count by rule_name, urgency, status
+| stats count by mitre_technique
+
+13. Saved Searches & Reports
+
+    🔸 Settings > Searches, reports, and alerts
+
+
